@@ -30,7 +30,7 @@ td {
 }
 
 input {
-  height: 1.8rem;
+  height: 1.6rem;
 }
 
 .background {
@@ -72,4 +72,7 @@ input {
   width: 40%;
   font-size: 120%;
  }
+ input {
+  height: 1.8rem;
+}
 }
