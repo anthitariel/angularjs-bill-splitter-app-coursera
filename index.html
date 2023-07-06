@@ -1,107 +1,148 @@
 <html>
-
-<header>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>    
-    <link rel="stylesheet" href="css/master.css">
+  <header>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <link rel="stylesheet" href="css/master.css" />
     <title>Bill Splitter</title>
-</header>
-<body>
+  </header>
+  <body>
+    <div ng-app="billSplitter" ng-controller="appController" class="background">
+      <form name="appForm">
+        <table class="responsive-table">
+          <colgroup>
+            <col width="45%" />
+            <col width="10%" />
+            <col width="45%" />
+          </colgroup>
+          <tr>
+            <td colspan="3">
+              <h1>BILL SPLITTER</h1>
+            </td>
+          </tr>
 
-<div ng-app="billSplitter" ng-controller="appController" class="background">
-    <form name="appForm">
-        <table>
-            <colgroup>
-                <col width="45%">
-                <col width="10%">
-                <col width="45%">
-            </colgroup>
-            <tr>
-                <td colspan="3">
-                    <h1>BILL SPLITTER</h1>
-                </td>
-            </tr>
+          <tr>
+            <td>Bill amount</td>
+            <td>
+              <input
+                type="number"
+                min="0.10"
+                name="billAmount"
+                ng-model="billAmount"
+                required
+              />
+            </td>
+            <td class="right-aligned">
+              {{billAmount | currency : "€"}}<span
+                class="red-flag"
+                ng-show="appForm.billAmount.$invalid"
+                >Required</span
+              >
+            </td>
+          </tr>
 
-            <tr>
-                <td>Bill amount</td>
-                <td><input type="number" min="0.10" name="billAmount" ng-model="billAmount" required></td>
-                <td class="right-aligned">{{billAmount | currency : "€"}}<span class="red-flag" ng-show="appForm.billAmount.$invalid">Required</span></td>        
-            </tr>
+          <tr>
+            <td>Tip%</td>
+            <td>
+              <input
+                type="number"
+                min="0"
+                name="tipPercentage"
+                ng-model="tipPercentage"
+                required
+              />
+            </td>
+            <td class="underlined right-aligned">
+              + {{tipCalculated | currency : "€"}}<span
+                class="red-flag"
+                ng-show="appForm.tipPercentage.$invalid"
+                >Required</span
+              >
+            </td>
+          </tr>
 
-            <tr>
-                <td>Tip%</td>
-                <td><input type="number" min="0" name="tipPercentage" ng-model="tipPercentage" required></td>
-                <td class="underlined right-aligned">+ {{tipCalculated | currency : "€"}}<span class="red-flag" ng-show="appForm.tipPercentage.$invalid">Required</span></td>
-            </tr>
+          <tr>
+            <td colspan="2">Total</td>
+            <td class="right-aligned double-underlined">
+              {{total | currency : "€"}}
+            </td>
+          </tr>
 
-            <tr>
-                <td colspan="2">Total</td>
-                <td class="right-aligned double-underlined">{{total | currency : "€"}}</td>
-            </tr>
+          <tr>
+            <td>Party size</td>
+            <td>
+              <input
+                type="number"
+                min="1"
+                name="partySize"
+                ng-model="partySize"
+                required
+              />
+            </td>
+            <td class="right-aligned">
+              <span class="red-flag" ng-show="appForm.partySize.$invalid"
+                >Required</span
+              >
+            </td>
+          </tr>
 
-            <tr>
-                <td>Party size</td>
-                <td><input type="number" min="1" name="partySize" ng-model="partySize" required></td>
-                <td class="right-aligned"><span class="red-flag" ng-show="appForm.partySize.$invalid">Required</span></td>
-            </tr>
-            
-            <tr>
-                <td class="right-aligned" colspan="2">Each pays</td>
-                <td class="right-aligned">{{ perParty | currency : "€"}}</td>
-            </tr>
+          <tr>
+            <td class="right-aligned" colspan="2">Each pays</td>
+            <td class="right-aligned">{{ perParty | currency : "€"}}</td>
+          </tr>
 
-            <tr>
-                <td colspan="2" class="right-aligned">
-                    <span class="green-flag" ng-show="oddChange > 0">Excess</span>
-                    <span class="red-flag" ng-show="oddChange < 0">Short</span>
-              
-                </td>
-                <td class="right-aligned" ng-show="oddChange != 0">{{oddChange | currency : "€"}}</td>
-            </tr>
-
+          <tr>
+            <td colspan="2" class="right-aligned">
+              <span class="green-flag" ng-show="oddChange > 0">Excess</span>
+              <span class="red-flag" ng-show="oddChange < 0">Short</span>
+            </td>
+            <td class="right-aligned" ng-show="oddChange != 0">
+              {{oddChange | currency : "€"}}
+            </td>
+          </tr>
         </table>
 
-        <table ng-show="appForm.billAmount.$valid">
-            <colgroup>
-                <col width="47">
-                <col width="53%">
-            </colgroup>
+        <table class="responsive-table" ng-show="appForm.billAmount.$valid">
+          <colgroup>
+            <col width="47" />
+            <col width="53%" />
+          </colgroup>
 
-            <tr>
-                <td colspan="2"><h2>Tip Table</h2></td>
-            </tr>
+          <tr>
+            <td colspan="2"><h2>Tip Table</h2></td>
+          </tr>
 
-            <tr ng-repeat="pct in tipTablePercentages">
-                <td ng-if="$even" class="shaded right-aligned">{{pct + "%"}}</td>
-                <td ng-if="$even" class="shaded">{{calcTip(billAmount, pct) | currency : "€"}}</td>
-                <td ng-if="$odd" class="right-aligned">{{pct + "%"}}</td>
-                <td ng-if="$odd" >{{calcTip(billAmount, pct) | currency : "€"}}</td>
-            </tr>
-
+          <tr ng-repeat="pct in tipTablePercentages">
+            <td ng-if="$even" class="shaded right-aligned">{{pct + "%"}}</td>
+            <td ng-if="$even" class="shaded">
+              {{calcTip(billAmount, pct) | currency : "€"}}
+            </td>
+            <td ng-if="$odd" class="right-aligned">{{pct + "%"}}</td>
+            <td ng-if="$odd">{{calcTip(billAmount, pct) | currency : "€"}}</td>
+          </tr>
         </table>
+      </form>
+    </div>
 
-    </form>
-</div>
+    <script>
+      var app = angular.module("billSplitter", []);
 
-<script>
-    var app = angular.module("billSplitter", []);
-
-    app.controller("appController", ($scope) => {
-
+      app.controller("appController", ($scope) => {
         $scope.tipTablePercentages = [5, 10, 12, 15, 18, 20, 25];
 
         $scope.calcTip = (amount, percentage) => {
-            return (amount * percentage / 100).toFixed(2);
-        }
-        
+          return ((amount * percentage) / 100).toFixed(2);
+        };
+
         $scope.$watchGroup(["billAmount", "tipPercentage", "partySize"], () => {
-            $scope.tipCalculated = $scope.calcTip($scope.billAmount, $scope.tipPercentage)
-            $scope.total = Number($scope.billAmount) + Number($scope.tipCalculated);
-            $scope.perParty = ($scope.total / $scope.partySize).toFixed(2);
-            $scope.oddChange = $scope.perParty * $scope.partySize - $scope.total
+          $scope.tipCalculated = $scope.calcTip(
+            $scope.billAmount,
+            $scope.tipPercentage
+          );
+          $scope.total =
+            Number($scope.billAmount) + Number($scope.tipCalculated);
+          $scope.perParty = ($scope.total / $scope.partySize).toFixed(2);
+          $scope.oddChange = $scope.perParty * $scope.partySize - $scope.total;
         });
-    });
-
-</script>
-
-</body>
+      });
+    </script>
+  </body>
 </html>
