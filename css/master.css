@@ -29,6 +29,10 @@ td {
   padding: 0.5rem;
 }
 
+input {
+  height: 1.8rem;
+}
+
 .background {
   background-image: url(../images/bkg.jpg);
   background-position: center;
